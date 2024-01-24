@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "@components": [
+        "./components"
+      ],
+      "@pages": [
+        "./pages"
+      ],
+      "@assets": [
+        "./assets"
+      ],
+      "@images": [
+        "./assets/img"
+      ],
+      "@icons": [
+        "./assets/icons"
+      ]
+    }
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
