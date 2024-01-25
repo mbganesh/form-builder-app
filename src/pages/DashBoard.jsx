@@ -17,24 +17,36 @@ import UserStats from "components/dashBoard/UserStats";
 import FormList from "components/dashBoard/FormList";
 import styled from "@emotion/styled";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
+import { useNavigate } from "react-router-dom";
+import EditNoteIcon from '@mui/icons-material/EditNote';
 
-const CreateBox = styled(Box)(({ theme }) => ({
-  minWidth: "500px",
+const CreateBox = styled(Box)(({ theme, bgColor, hColor , color }) => ({
+  minWidth: "20%",
   height: "150px",
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  color: "grey",
+  color:color ??  "#",
   border: "3px dotted grey",
   borderRadius: "10px",
-  backgroundColor: "transparent",
+  backgroundColor: bgColor ? bgColor : "transparent",
   "&:hover": {
     cursor: "pointer",
-    background: "green",
+    background: hColor ? hColor : "",
     transition: "0.2s linear",
     color: "white",
     borderStyle: "solid",
+  },
+
+  [theme.breakpoints.down("sm")]: {
+    minWidth: "100%",
+  },
+  [theme.breakpoints.up("md")]: {
+    minWidth: "35%",
+  },
+  [theme.breakpoints.up("lg")]: {
+    minWidth: "30%",
   },
 }));
 
@@ -65,7 +77,17 @@ const statsArr = [
   },
 ];
 const DashBoard = () => {
+  const navigate = useNavigate()
   const [formOpen, setFormOpen] = useState(false);
+
+  const handleFormCreateBtn = () => {
+    // setFormOpen(true)
+    navigate('/builder')
+  }
+
+  const handleFormCardBtn = () => {
+    
+  }
 
   return (
     <>
@@ -94,20 +116,25 @@ const DashBoard = () => {
           ))}
         </Box>
 
-        <Divider sx={{ margin: "30px", background: "red" }} />
+        <Divider sx={{ margin: "30px", background: "grey" }} />
 
-        <Typography variant="h3"> Your Forms </Typography>
+        <Typography variant="h3" textAlign={'center'}> Your Forms </Typography>
 
-        <Divider sx={{ margin: "30px", background: "red" }} />
+        <Divider sx={{ margin: "30px", background: "grey" }} />
 
         <Stack direction="row" gap={2} flexWrap="wrap">
-          <CreateBox onClick={() => setFormOpen(true)}>
+          <CreateBox bgColor="#054718" hColor='#011c09' color='grey' onClick={() => handleFormCreateBtn()}>
             <CreateNewFolderIcon fontSize="large" />
-            <Typography variant="h4">Create a new form</Typography>
+            <Typography variant="h5">Create a new form</Typography>
           </CreateBox>
 
-          {/* Others */}
-          <FormList />
+          {[0, 0, 0, 0].map((el) => (
+            <CreateBox bgColor="#5B5C5C" hColor='#181818' color='#A4a6a4' onClick={() =>handleFormCardBtn()}>
+              <Typography variant="h6">some form name</Typography>
+              <Typography variant="body2">some random description about this form</Typography>
+              <Button startIcon={<EditNoteIcon/>} fullWidth sx={{mt:'10px' , color:'#fff' , textTransform:'none'}} color="success" variant="contained"> Edit Form </Button>
+            </CreateBox>
+          ))}
         </Stack>
       </Box>
 
