@@ -11,11 +11,9 @@ const { createTheme } = require("@mui/material");
 
 function App() {
   let location = useLocation();
-  const isHome = window.location.pathname.split("/");
 
   const [pageTheme, setPageTheme] = useState(true);
 
-  console.log("isHome", isHome);
   const darkTheme = createTheme({
     palette: {
       mode: pageTheme ? "dark" : "light",
@@ -24,8 +22,6 @@ function App() {
       fontFamily: ["Playpen Sans", "cursive"].join(","),
     },
   });
-
-  console.log("location.pathname", location.pathname);
 
   return (
     <ThemeProvider theme={darkTheme}>

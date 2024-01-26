@@ -14,11 +14,12 @@ import CalendarViewMonthIcon from "@mui/icons-material/CalendarViewMonth";
 import MultipleStopIcon from "@mui/icons-material/MultipleStop";
 import MergeTypeIcon from "@mui/icons-material/MergeType";
 import UserStats from "components/dashBoard/UserStats";
-import FormList from "components/dashBoard/FormList";
 import styled from "@emotion/styled";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import EditNoteIcon from "@mui/icons-material/EditNote";
+import useIdStore from "../store/index";
+import { useCreateForm, useFormList } from "ApiHelper";
 
 const CreateBox = styled(Box)(({ theme, bgColor, hColor, color }) => ({
   minWidth: "20%",
@@ -77,25 +78,47 @@ const statsArr = [
   },
 ];
 const DashBoard = ({ setPageTheme }) => {
+  const { userId } = useIdStore();
   const navigate = useNavigate();
+  const location = useLocation();
   const [formOpen, setFormOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
   });
 
-  const handleFormCreateBtn = () => {
+  const CreateFormMutation = useCreateForm();
+  const { data: formList } = useFormList({ userId: userId });
+
+  const handleFormCreateBtn = async () => {
     // setFormOpen(true)
-    if (formData.title && formData.description) {
-      // FIXME: implement API works
-      navigate("/builder", { state: formData });
+    if (formData.title && formData.description && userId) {
+      const userData = {
+        userId: userId,
+        title: formData.title,
+        description: formData.description,
+      };
+      let result = await CreateFormMutation.mutateAsync(userData);
+
+      navigate("/builder", {
+        state: { _id: result?.data?.data?._id, title: formData.title },
+      });
+      // navigate("/builder", { state: formData });
     }
   };
 
-  const handleFormCardBtn = () => {};
+  const handleFormCardBtn = (id, title) => {
+    navigate("/builder", {
+      state: { _id: id, title: title },
+    });
+  };
 
   useLayoutEffect(() => {
     setPageTheme(true);
+    if (!userId) {
+      navigate("/");
+      return;
+    }
   }, []);
 
   return (
@@ -145,18 +168,17 @@ const DashBoard = ({ setPageTheme }) => {
             <Typography variant="h5">Create a new form</Typography>
           </CreateBox>
 
-          {[0, 0, 0, 0].map((el) => (
+          {formList?.data?.data.map(({ _id, title, description, userId }) => (
             <CreateBox
+              key={_id}
               bgColor="#5B5C5C"
               hColor="#181818"
               color="#A4a6a4"
-              onClick={() => handleFormCardBtn()}
             >
-              <Typography variant="h6">some form name</Typography>
-              <Typography variant="body2">
-                some random description about this form
-              </Typography>
+              <Typography variant="h6">{title}</Typography>
+              <Typography variant="body2">{description}</Typography>
               <Button
+                onClick={() => handleFormCardBtn(_id, title)}
                 startIcon={<EditNoteIcon />}
                 fullWidth
                 sx={{ mt: "10px", color: "#fff", textTransform: "none" }}

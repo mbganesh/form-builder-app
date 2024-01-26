@@ -11,31 +11,41 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-
-import { userLogin } from "apis";
-import { usePostApi } from "ApiHelper";
+import { useUserSignUp } from "ApiHelper";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import useIdStore from "store";
 
 export default function SignUp() {
-  const loginMutation = usePostApi();
+  const mutation = useUserSignUp();
+  const navigate = useNavigate();
+  const {  updateUserId } = useIdStore();
 
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const userName = data.get("firstName") + " " + data.get("lastName");
+    try {
+      event.preventDefault();
+      const data = new FormData(event.currentTarget);
+      const userName = data.get("firstName") + " " + data.get("lastName");
+      const userData = {
+        userName,
+        email: data.get("email"),
+        password: data.get("password"),
+      };
+      let result = await mutation.mutateAsync(userData);
 
-    const userData = {
-      userName,
-      email: data.get("email"),
-      password: data.get("password"),
-    };
-
-    console.log(userData);
-
-const res = await loginMutation.mutateAsync(
-  
-)
-
+      if (result?.data?.status) {
+        setTimeout(() => {
+          navigate("/home", { state: { _id: result?.data?.data?._id } });
+        }, 800);
+        updateUserId(result?.data?.data?._id);
+        toast.success(result?.data?.message);
+      } else {
+        toast.error(result?.data?.message);
+      }
+    } catch (e) {
+      console.log("Err:", e.message);
+    }
   };
 
   return (
@@ -97,12 +107,6 @@ const res = await loginMutation.mutateAsync(
                 type="password"
                 id="password"
                 autoComplete="new-password"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={<Checkbox value="allowExtraEmails" color="primary" />}
-                label="I want to receive inspiration, marketing promotions and updates via email."
               />
             </Grid>
           </Grid>

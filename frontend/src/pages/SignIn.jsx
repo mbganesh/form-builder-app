@@ -12,22 +12,40 @@ import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
+import { useUserSignIn } from "ApiHelper";
+import { toast } from "react-toastify";
+import useIdStore from "../store/index";
 
 export default function SignInSide() {
   const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log(
-      {
+  const {  updateUserId } = useIdStore();
+
+  const mutation = useUserSignIn();
+
+  const handleSubmit = async (event) => {
+    try {
+      event.preventDefault();
+      const data = new FormData(event.currentTarget);
+
+      const userData = {
         email: data.get("email"),
         password: data.get("password"),
-      },
-      "ff"
-    );
+      };
+      let result = await mutation.mutateAsync(userData);
 
-    navigate("/home");
+      if (result?.data?.status) {
+        setTimeout(() => {
+          navigate("/home", { state: { _id: result?.data?.data?._id } });
+        }, 800);
+        updateUserId(result?.data?.data?._id);
+        toast.success(result?.data?.message);
+      } else {
+        toast.error(result?.data?.message);
+      }
+    } catch (e) {
+      console.log("Err:", e.message);
+    }
   };
 
   return (

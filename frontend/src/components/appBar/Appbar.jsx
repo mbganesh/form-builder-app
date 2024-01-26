@@ -16,7 +16,7 @@ const Appbar = () => {
           }}
         >
           <Typography variant="h5" sx={{ flexGrow: 1 , fontWeight:'bold' , '&:hover':{cursor:'pointer'} }}
-          onClick={() => navigate('/')}
+          // onClick={() => navigate('/')}
           >
             Form Builder
           </Typography>
